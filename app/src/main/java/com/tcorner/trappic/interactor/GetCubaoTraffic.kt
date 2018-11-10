@@ -13,7 +13,10 @@ class GetCubaoTraffic constructor(
 ) : BaseUseCase<Double>() {
 
     override suspend fun execute(): Double {
-        val distanceMatrix = distanceMatrixRepository.getDistanceDetails(EdsaLocation.QMART, EdsaLocation.SANTOLAN)
+        val distanceMatrix = distanceMatrixRepository.getDistanceDetails(
+            "${EdsaLocation.QMART_LAT}, ${EdsaLocation.QMART_LNG}",
+            "${EdsaLocation.SANTOLAN_LAT}, ${EdsaLocation.SANTOLAN_LNG}"
+        )
 
         val duration: Double =
             distanceMatrix?.rows?.get(0)?.elements?.get(0)?.duration?.value?.toDouble() ?: throw NullDurationException()

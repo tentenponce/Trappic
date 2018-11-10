@@ -1,6 +1,5 @@
 package com.tcorner.trappic
 
-import android.util.Log
 import com.tcorner.trappic.model.DistanceMatrix
 
 class DistanceMatrixClient(private val mService: DistanceMatrixService) {
@@ -18,8 +17,6 @@ class DistanceMatrixClient(private val mService: DistanceMatrixService) {
         addDeferred(deferred)
 
         val distanceMatrix = errorHandler(deferred)
-
-        Log.e("androidruntime", distanceMatrix.toString())
 
         return distanceMatrix
     }
