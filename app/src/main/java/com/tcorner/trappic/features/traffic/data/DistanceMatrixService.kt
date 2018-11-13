@@ -1,12 +1,16 @@
-package com.tcorner.trappic
+package com.tcorner.trappic.features.traffic.data
 
 import com.tcorner.trappic.model.DistanceMatrix
-import kotlinx.coroutines.Deferred
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface DistanceMatrixService {
+/**
+ *
+ * Created by Exequiel Egbert V. Ponce on 11/13/2018.
+ */
+internal interface DistanceMatrixService {
 
     @GET("json")
     fun getDistanceMatrix(
@@ -16,5 +20,5 @@ interface DistanceMatrixService {
         @Query("mode") mode: String,
         @Query("departure_time") departureTime: String,
         @Query("traffic_model") trafficModel: String
-    ): Deferred<Response<DistanceMatrix>>
+    ): Call<Response<DistanceMatrix>>
 }

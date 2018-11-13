@@ -49,7 +49,7 @@ dependencies {
 
     implementation "com.squareup.retrofit2:retrofit:$project.ext.retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$project.ext.retrofitVersion"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$project.ext.retrofitCoroutineVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$project.ext.okhttpVersion"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$project.ext.coroutinesVersion"
 }
@@ -62,7 +62,7 @@ dependencies {
 def getDebugApiKey() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("debug_google_maps_key");
+    return properties.getProperty("debug_google_maps_key")
 }
 
 /**
@@ -73,5 +73,5 @@ def getDebugApiKey() {
 def getReleaseApiKey() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("release_google_maps_key");
+    return properties.getProperty("release_google_maps_key")
 }

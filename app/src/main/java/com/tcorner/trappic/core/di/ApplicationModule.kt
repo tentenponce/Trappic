@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fernandocejas.sample.core.di
+package com.tcorner.trappic.core.di
 
 import android.content.Context
-import com.fernandocejas.sample.AndroidApplication
-import com.fernandocejas.sample.BuildConfig
-import com.fernandocejas.sample.features.movies.MoviesRepository
-import dagger.Module
+import com.tcorner.trappic.BuildConfig
+import com.tcorner.trappic.TrappicApp
 import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
-@Module
-class ApplicationModule(private val application: AndroidApplication) {
+@dagger.Module
+class ApplicationModule(private val application: TrappicApp) {
 
-    @Provides @Singleton fun provideApplicationContext(): Context = application
+    @Provides
+    @Singleton
+    fun provideApplicationContext(): Context = application
 
-    @Provides @Singleton fun provideRetrofit(): Retrofit {
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-                .baseUrl("https://raw.githubusercontent.com/android10/Sample-Data/master/Android-CleanArchitecture-Kotlin/")
-                .client(createClient())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            .baseUrl(BASE_URL)
+            .client(createClient())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
     }
 
     private fun createClient(): OkHttpClient {
@@ -49,5 +51,11 @@ class ApplicationModule(private val application: AndroidApplication) {
         return okHttpClientBuilder.build()
     }
 
-    @Provides @Singleton fun provideMoviesRepository(dataSource: MoviesRepository.Network): MoviesRepository = dataSource
+//    @Provides
+//    @Singleton
+//    fun provideMoviesRepository(dataSource: MoviesRepository.Network): MoviesRepository = dataSource
+
+    companion object {
+        const val BASE_URL = "https://maps.googleapis.com/maps/api/distancematrix/"
+    }
 }
