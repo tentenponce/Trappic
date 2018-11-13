@@ -2,8 +2,8 @@ package com.tcorner.trappic.interactor
 
 import com.tcorner.trappic.DistanceMatrixRepository
 import com.tcorner.trappic.EdsaLocation
-import com.tcorner.trappic.exception.NullDurationException
-import com.tcorner.trappic.exception.NullDurationTrafficException
+import com.tcorner.trappic.core.exception.NullDurationException
+import com.tcorner.trappic.core.exception.NullDurationTrafficException
 
 /**
  * returns percentage of cubao's traffic

@@ -1,6 +1,6 @@
 package com.tcorner.trappic
 
-import com.tcorner.trappic.exception.UnhandledStatusException
+import com.tcorner.trappic.core.exception.UnhandledStatusException
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import javax.net.ssl.HttpsURLConnection

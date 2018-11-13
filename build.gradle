@@ -26,6 +26,10 @@ allprojects {
 
         retrofitVersion = '2.4.0'
         retrofitCoroutineVersion = '0.9.2'
+
+        daggerVersion = '2.11'
+
+        googleVersion = '16.0.0'
     }
 }
 
