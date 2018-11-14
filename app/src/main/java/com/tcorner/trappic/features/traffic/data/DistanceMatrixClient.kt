@@ -13,24 +13,24 @@ import javax.inject.Singleton
  */
 @Singleton
 class DistanceMatrixClient
-@Inject constructor(
-    private val retrofit: Retrofit
-) : DistanceMatrixService {
+@Inject constructor(private val retrofit: Retrofit) {
     private val distanceMatrixService by lazy { retrofit.create(DistanceMatrixService::class.java) }
 
-    override fun getDistanceMatrix(
+    fun getDistanceMatrix(
         origins: String,
         destinations: String,
         key: String,
         mode: String,
         departureTime: String,
         trafficModel: String
-    ): Call<Response<DistanceMatrix>> = distanceMatrixService.getDistanceMatrix(
-        origins = origins,
-        destinations = destinations,
-        key = key,
-        mode = mode,
-        departureTime = departureTime,
-        trafficModel = trafficModel
-    )
+    ): Call<Response<DistanceMatrix>> {
+        return distanceMatrixService.getDistanceMatrix(
+            origins = origins,
+            destinations = destinations,
+            key = key,
+            mode = mode,
+            departureTime = departureTime,
+            trafficModel = trafficModel
+        )
+    }
 }
