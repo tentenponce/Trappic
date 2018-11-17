@@ -1,9 +1,7 @@
-package com.tcorner.trappic
+package com.tcorner.trappic.features.ui
 
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -11,36 +9,37 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
-import com.tcorner.trappic.interactor.GetCubaoTraffic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.tcorner.trappic.R
+import com.tcorner.trappic.core.base.BaseActivity
+import com.tcorner.trappic.core.exception.Failure
+import com.tcorner.trappic.core.extension.failure
+import com.tcorner.trappic.core.extension.observe
+import com.tcorner.trappic.core.extension.viewModel
+import com.tcorner.trappic.features.global.data.EdsaLocation
 
 
-class MainActivity : AppCompatActivity(),
+class MainActivity : BaseActivity(),
     OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
+    private lateinit var mainViewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        appComponent.inject(this)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val getCubaoTraffic =
-            GetCubaoTraffic(DistanceMatrixRepositoryImpl(DistanceMatrixClient(DistanceMatrixFactory.makeDistanceMatrixService())))
-
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                val percentage = getCubaoTraffic.execute()
-                Toast.makeText(this@MainActivity, "percentage: " + percentage, Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Error: " + e.javaClass.simpleName, Toast.LENGTH_LONG).show()
-            }
+        mainViewModel = viewModel(viewModelFactory) {
+            observe(cubaoTraffic) { /* TODO handle percentage */ }
+            failure(failure, ::handleFailure)
         }
+
+        mainViewModel.getCubaoTraffic()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -64,5 +63,9 @@ class MainActivity : AppCompatActivity(),
                     .target(qMartLocation).zoom(15f).build()
             )
         )
+    }
+
+    private fun handleFailure(failure: Failure?) {
+        /* TODO handle failure */
     }
 }

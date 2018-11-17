@@ -1,4 +1,4 @@
-package com.tcorner.trappic
+package com.tcorner.trappic.features.global.data
 
 object EdsaLocation {
     const val QMART_LAT = 14.628041

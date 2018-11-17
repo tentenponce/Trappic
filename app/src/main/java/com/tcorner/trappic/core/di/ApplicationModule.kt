@@ -18,6 +18,8 @@ package com.tcorner.trappic.core.di
 import android.content.Context
 import com.tcorner.trappic.BuildConfig
 import com.tcorner.trappic.TrappicApp
+import com.tcorner.trappic.features.global.data.DistanceMatrixClient
+import com.tcorner.trappic.features.global.data.DistanceMatrixRepository
 import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -27,6 +29,10 @@ import javax.inject.Singleton
 
 @dagger.Module
 class ApplicationModule(private val application: TrappicApp) {
+
+    companion object {
+        const val BASE_URL = "https://maps.googleapis.com/maps/api/distancematrix/"
+    }
 
     @Provides
     @Singleton
@@ -51,11 +57,8 @@ class ApplicationModule(private val application: TrappicApp) {
         return okHttpClientBuilder.build()
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideMoviesRepository(dataSource: MoviesRepository.Network): MoviesRepository = dataSource
-
-    companion object {
-        const val BASE_URL = "https://maps.googleapis.com/maps/api/distancematrix/"
-    }
+    @Provides
+    @Singleton
+    fun provideDistanceMatrixRepository(distanceMatrixClient: DistanceMatrixClient): DistanceMatrixRepository =
+        DistanceMatrixRepository.DistanceMatrixRepositoryImpl(distanceMatrixClient)
 }

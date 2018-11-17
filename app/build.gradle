@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -52,6 +53,8 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$project.ext.okhttpVersion"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$project.ext.coroutinesVersion"
+
+    implementation "android.arch.lifecycle:extensions:$project.ext.archComponentsVersion"
 }
 
 /**

@@ -1,8 +1,7 @@
-package com.tcorner.trappic.features.traffic.data
+package com.tcorner.trappic.features.global.data
 
-import com.tcorner.trappic.model.DistanceMatrix
+import com.tcorner.trappic.features.model.DistanceMatrix
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -20,5 +19,5 @@ internal interface DistanceMatrixService {
         @Query("mode") mode: String,
         @Query("departure_time") departureTime: String,
         @Query("traffic_model") trafficModel: String
-    ): Call<Response<DistanceMatrix>>
+    ): Call<DistanceMatrix>
 }

@@ -1,8 +1,9 @@
 package com.tcorner.trappic
 
 import android.app.Application
-import com.fernandocejas.sample.core.di.ApplicationModule
 import com.tcorner.trappic.core.di.ApplicationComponent
+import com.tcorner.trappic.core.di.DaggerApplicationComponent
+import com.tcorner.trappic.core.di.ApplicationModule
 
 /**
  *

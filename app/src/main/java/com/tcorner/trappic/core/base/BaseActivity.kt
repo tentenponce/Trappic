@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tcorner.trappic.core.di.viewmodel
+package com.tcorner.trappic.core.base
 
-import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import com.tcorner.trappic.features.ui.MainViewModel
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoMap
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import com.tcorner.trappic.TrappicApp
+import com.tcorner.trappic.core.di.ApplicationComponent
+import javax.inject.Inject
 
-@Module
-abstract class ViewModelModule {
-    @Binds
-    internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+abstract class BaseActivity : AppCompatActivity() {
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(MainViewModel::class)
-    abstract fun bindsMainViewModel(mainViewModel: MainViewModel): ViewModel
+    val appComponent: ApplicationComponent by lazy(mode = LazyThreadSafetyMode.NONE) {
+        (application as TrappicApp).appComponent
+    }
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    internal fun firstTimeCreated(savedInstanceState: Bundle?) = savedInstanceState == null
 }
