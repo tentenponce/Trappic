@@ -1,4 +1,4 @@
-package com.tcorner.trappic.features.ui
+package com.tcorner.trappic.features.traffic.ui
 
 import android.arch.lifecycle.MutableLiveData
 import com.tcorner.trappic.core.base.BaseViewModel

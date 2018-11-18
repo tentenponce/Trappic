@@ -21,7 +21,7 @@
                 android:value="@string/GOOGLE_MAPS_KEY"/>
 
         <activity
-                android:name=".features.ui.MainActivity"
+                android:name="com.tcorner.trappic.features.traffic.ui.MainActivity"
                 android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

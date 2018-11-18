@@ -1,6 +1,6 @@
 package com.tcorner.trappic.features.global.data
 
-import com.tcorner.trappic.features.model.DistanceMatrix
+import com.tcorner.trappic.features.traffic.model.DistanceMatrix
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

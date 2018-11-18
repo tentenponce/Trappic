@@ -1,4 +1,4 @@
-package com.tcorner.trappic.features.model
+package com.tcorner.trappic.features.traffic.model
 
 import com.squareup.moshi.Json
 

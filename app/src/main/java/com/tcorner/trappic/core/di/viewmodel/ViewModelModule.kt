@@ -17,7 +17,7 @@ package com.tcorner.trappic.core.di.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import com.tcorner.trappic.features.ui.MainViewModel
+import com.tcorner.trappic.features.traffic.ui.MainViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap

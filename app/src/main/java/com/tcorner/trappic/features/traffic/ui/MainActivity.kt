@@ -1,4 +1,4 @@
-package com.tcorner.trappic.features.ui
+package com.tcorner.trappic.features.traffic.ui
 
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory

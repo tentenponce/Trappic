@@ -2,7 +2,7 @@ package com.tcorner.trappic.core.di
 
 import com.tcorner.trappic.TrappicApp
 import com.tcorner.trappic.core.di.viewmodel.ViewModelModule
-import com.tcorner.trappic.features.ui.MainActivity
+import com.tcorner.trappic.features.traffic.ui.MainActivity
 import dagger.Component
 import javax.inject.Singleton
 

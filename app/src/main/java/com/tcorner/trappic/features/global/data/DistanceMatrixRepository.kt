@@ -3,7 +3,7 @@ package com.tcorner.trappic.features.global.data
 import com.tcorner.trappic.BuildConfig
 import com.tcorner.trappic.core.exception.Failure
 import com.tcorner.trappic.core.interactor.Either
-import com.tcorner.trappic.features.model.DistanceMatrix
+import com.tcorner.trappic.features.traffic.model.DistanceMatrix
 import javax.inject.Inject
 
 /**

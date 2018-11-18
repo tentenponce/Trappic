@@ -4,7 +4,7 @@ import com.tcorner.trappic.core.exception.Failure
 import com.tcorner.trappic.core.helper.RetrofitHelper
 import com.tcorner.trappic.core.interactor.Either
 import com.tcorner.trappic.core.util.NetworkUtil
-import com.tcorner.trappic.features.model.DistanceMatrix
+import com.tcorner.trappic.features.traffic.model.DistanceMatrix
 import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
