@@ -1,6 +1,5 @@
 package com.tcorner.trappic.features.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,7 +20,11 @@ import com.tcorner.trappic.features.global.data.EdsaLocation
 class MainActivity : BaseActivity(),
     OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+    companion object {
+        private const val POLYLINE_WIDTH = 30f
+    }
+
+    internal lateinit var mMap: GoogleMap
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -35,28 +38,21 @@ class MainActivity : BaseActivity(),
         mapFragment.getMapAsync(this)
 
         mainViewModel = viewModel(viewModelFactory) {
-            observe(cubaoTraffic) { /* TODO handle percentage */ }
+            observe(cubaoTraffic) { showCubaoLine(getTrafficColor(cubaoTraffic.value ?: 0.0)) }
             failure(failure, ::handleFailure)
         }
-
-        mainViewModel.getCubaoTraffic()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        mainViewModel.getTrafficInfo()
+
+        /* setup lines initially */
+        showCubaoLine(getTrafficColor(0.0))
+
+        /* setup the camera */
         val qMartLocation = LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG)
-
-        val line = mMap.addPolyline(
-            PolylineOptions()
-                .add(
-                    LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG),
-                    LatLng(EdsaLocation.SANTOLAN_LAT, EdsaLocation.SANTOLAN_LNG)
-                )
-                .width(5f)
-                .color(Color.RED)
-        )
-
         mMap.animateCamera(
             CameraUpdateFactory.newCameraPosition(
                 CameraPosition.Builder()
@@ -67,5 +63,26 @@ class MainActivity : BaseActivity(),
 
     private fun handleFailure(failure: Failure?) {
         /* TODO handle failure */
+    }
+
+    private fun showCubaoLine(color: Int) {
+        val line = mMap.addPolyline(
+            PolylineOptions()
+                .add(
+                    LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG),
+                    LatLng(EdsaLocation.SANTOLAN_LAT, EdsaLocation.SANTOLAN_LNG)
+                )
+                .width(POLYLINE_WIDTH)
+                .color(color)
+        )
+    }
+
+    private fun getTrafficColor(percentage: Double): Int {
+        return when {
+            percentage >= 70 -> resources.getColor(R.color.colorHeavyTraffic)
+            percentage >= 35 -> resources.getColor(R.color.colorMediumTraffic)
+            percentage >= 15 -> resources.getColor(R.color.colorMildTraffic)
+            else -> resources.getColor(R.color.colorNoTraffic)
+        }
     }
 }

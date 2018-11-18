@@ -13,7 +13,9 @@ class MainViewModel @Inject constructor(private val getCubaoTraffic: GetCubaoTra
 
     var cubaoTraffic: MutableLiveData<Double> = MutableLiveData()
 
-    fun getCubaoTraffic() = getCubaoTraffic { it.either(::handleFailure, ::setCubaoTraffic) }
+    fun getTrafficInfo() {
+        getCubaoTraffic { it.either(::handleFailure, ::setCubaoTraffic) }
+    }
 
     private fun setCubaoTraffic(cubaoTraffic: Double) {
         this.cubaoTraffic.value = cubaoTraffic
