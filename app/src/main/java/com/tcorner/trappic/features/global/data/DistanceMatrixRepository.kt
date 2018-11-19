@@ -21,20 +21,24 @@ interface DistanceMatrixRepository {
     }
 
     fun getDistanceMatrix(
-        origins: String,
-        destinations: String
+        originLat: Double,
+        originLng: Double,
+        destinationLat: Double,
+        destinationLng: Double
     ): Either<Failure, DistanceMatrix>
 
     class DistanceMatrixRepositoryImpl @Inject constructor(private val distanceMatrixClient: DistanceMatrixClient) :
         DistanceMatrixRepository {
 
         override fun getDistanceMatrix(
-            origins: String,
-            destinations: String
+            originLat: Double,
+            originLng: Double,
+            destinationLat: Double,
+            destinationLng: Double
         ): Either<Failure, DistanceMatrix> {
             return distanceMatrixClient.getDistanceMatrix(
-                origins = origins,
-                destinations = destinations,
+                origins = "$originLat, $originLng",
+                destinations = "$destinationLat, $destinationLng",
                 key = GOOGLE_MAPS_KEY,
                 mode = TRAVEL_MODE,
                 departureTime = DEPARTURE_TIME,

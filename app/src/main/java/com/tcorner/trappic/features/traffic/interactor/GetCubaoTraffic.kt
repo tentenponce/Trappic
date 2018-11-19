@@ -6,20 +6,26 @@ import com.tcorner.trappic.core.interactor.UseCaseNoParam
 import com.tcorner.trappic.core.interactor.flatMap
 import com.tcorner.trappic.features.global.data.DistanceMatrixRepository
 import com.tcorner.trappic.features.global.data.EdsaLocation
+import com.tcorner.trappic.features.traffic.model.TrafficInfo
 import javax.inject.Inject
 
 /**
  * returns percentage of cubao's traffic
  */
 class GetCubaoTraffic @Inject constructor(private val distanceMatrixRepository: DistanceMatrixRepository) :
-    UseCaseNoParam<Double>() {
+    UseCaseNoParam<TrafficInfo>() {
 
-    override suspend fun run(): Either<Failure, Double> {
-        return distanceMatrixRepository.getDistanceMatrix(
-            "${EdsaLocation.QMART_LAT}, ${EdsaLocation.QMART_LNG}",
-            "${EdsaLocation.SANTOLAN_LAT}, ${EdsaLocation.SANTOLAN_LNG}"
+    companion object {
+        const val NAME = "Cubao"
+    }
+
+    override suspend fun run(): Either<Failure, TrafficInfo> =
+        distanceMatrixRepository.getDistanceMatrix(
+            EdsaLocation.QMART_LAT,
+            EdsaLocation.QMART_LNG,
+            EdsaLocation.SANTOLAN_LAT,
+            EdsaLocation.SANTOLAN_LNG
         ).flatMap {
-
             val duration: Double =
                 it.rows?.get(0)?.elements?.get(0)?.duration?.value?.toDouble()
                     ?: return@flatMap Either.Left(TrafficFailure.NullDuration()) // get travel duration or return a failure
@@ -28,7 +34,12 @@ class GetCubaoTraffic @Inject constructor(private val distanceMatrixRepository: 
                 it.rows[0].elements?.get(0)?.durationInTraffic?.value?.toDouble()
                     ?: return@flatMap Either.Left(TrafficFailure.NullDurationTraffic()) // get the travel traffic duration or return a failure
 
-            Either.Right(((durationInTraffic - duration) / duration) * 100) // computation
+            Either.Right(
+                TrafficInfo(
+                    name = NAME,
+                    duration = duration,
+                    durationInTraffic = durationInTraffic
+                )
+            ) // computation
         }
-    }
 }

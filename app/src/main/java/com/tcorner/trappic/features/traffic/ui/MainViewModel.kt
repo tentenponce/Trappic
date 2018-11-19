@@ -3,6 +3,7 @@ package com.tcorner.trappic.features.traffic.ui
 import android.arch.lifecycle.MutableLiveData
 import com.tcorner.trappic.core.base.BaseViewModel
 import com.tcorner.trappic.features.traffic.interactor.GetCubaoTraffic
+import com.tcorner.trappic.features.traffic.model.TrafficInfo
 import javax.inject.Inject
 
 /**
@@ -11,13 +12,13 @@ import javax.inject.Inject
  */
 class MainViewModel @Inject constructor(private val getCubaoTraffic: GetCubaoTraffic) : BaseViewModel() {
 
-    var cubaoTraffic: MutableLiveData<Double> = MutableLiveData()
+    var cubaoTraffic: MutableLiveData<TrafficInfo> = MutableLiveData()
 
     fun getTrafficInfo() {
         getCubaoTraffic { it.either(::handleFailure, ::setCubaoTraffic) }
     }
 
-    private fun setCubaoTraffic(cubaoTraffic: Double) {
+    private fun setCubaoTraffic(cubaoTraffic: TrafficInfo) {
         this.cubaoTraffic.value = cubaoTraffic
     }
 }

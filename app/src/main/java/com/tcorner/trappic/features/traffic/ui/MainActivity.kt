@@ -7,6 +7,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.tcorner.trappic.R
 import com.tcorner.trappic.core.base.BaseActivity
@@ -15,7 +16,10 @@ import com.tcorner.trappic.core.extension.failure
 import com.tcorner.trappic.core.extension.observe
 import com.tcorner.trappic.core.extension.viewModel
 import com.tcorner.trappic.features.global.data.EdsaLocation
-
+import com.tcorner.trappic.features.global.util.DateUtil
+import com.tcorner.trappic.features.traffic.TrafficCalculatorFactory
+import com.tcorner.trappic.features.traffic.interactor.GetCubaoTraffic
+import com.tcorner.trappic.features.traffic.model.TrafficInfo
 
 class MainActivity : BaseActivity(),
     OnMapReadyCallback {
@@ -24,7 +28,7 @@ class MainActivity : BaseActivity(),
         private const val POLYLINE_WIDTH = 30f
     }
 
-    internal lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -38,7 +42,9 @@ class MainActivity : BaseActivity(),
         mapFragment.getMapAsync(this)
 
         mainViewModel = viewModel(viewModelFactory) {
-            observe(cubaoTraffic) { showCubaoLine(getTrafficColor(cubaoTraffic.value ?: 0.0)) }
+            observe(cubaoTraffic) {
+                showCubaoLine(cubaoTraffic.value)
+            }
             failure(failure, ::handleFailure)
         }
     }
@@ -49,7 +55,7 @@ class MainActivity : BaseActivity(),
         mainViewModel.getTrafficInfo()
 
         /* setup lines initially */
-        showCubaoLine(getTrafficColor(0.0))
+        showCubaoLine(TrafficInfo(name = GetCubaoTraffic.NAME, duration = -1.0, durationInTraffic = -1.0))
 
         /* setup the camera */
         val qMartLocation = LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG)
@@ -65,24 +71,62 @@ class MainActivity : BaseActivity(),
         /* TODO handle failure */
     }
 
-    private fun showCubaoLine(color: Int) {
-        val line = mMap.addPolyline(
+    private fun showCubaoLine(cubaoTraffic: TrafficInfo?) {
+        /* add line */
+        mMap.addPolyline(
             PolylineOptions()
                 .add(
                     LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG),
                     LatLng(EdsaLocation.SANTOLAN_LAT, EdsaLocation.SANTOLAN_LNG)
                 )
                 .width(POLYLINE_WIDTH)
-                .color(color)
+                .color(TrafficCalculatorFactory.buildTrafficColor(this, cubaoTraffic))
         )
+
+        /* add marker */
+        mMap.addMarker(
+            buildMarker(
+                LatLng(EdsaLocation.QMART_SANTOLAN_CENTER_LAT, EdsaLocation.QMART_SANTOLAN_CENTER_LNG),
+                cubaoTraffic?.name ?: getString(R.string.unknown_road),
+                TrafficCalculatorFactory.getDuration(cubaoTraffic),
+                TrafficCalculatorFactory.getDurationInTraffic(cubaoTraffic)
+            )
+        ).showInfoWindow()
     }
 
-    private fun getTrafficColor(percentage: Double): Int {
-        return when {
-            percentage >= 70 -> resources.getColor(R.color.colorHeavyTraffic)
-            percentage >= 35 -> resources.getColor(R.color.colorMediumTraffic)
-            percentage >= 15 -> resources.getColor(R.color.colorMildTraffic)
-            else -> resources.getColor(R.color.colorNoTraffic)
+    private fun buildMarker(latLng: LatLng, name: String, duration: Double, durationInTraffic: Double): MarkerOptions {
+        return MarkerOptions()
+            .position(latLng)
+            .title(
+                String.format(
+                    "%s %smin + %smin", name,
+                    if (duration < 0) 0 else buildTime(duration.toInt()),
+                    if (durationInTraffic < 0) 0 else buildTime(durationInTraffic.toInt())
+                )
+            )
+    }
+
+    private fun buildTime(time: Int): String {
+        val splittedTime = DateUtil.splitToComponentTimes(time)
+
+        val hour = splittedTime[0]
+        val min = splittedTime[1]
+
+        var timeString = ""
+
+        if (hour > 0) {
+            timeString += hour
         }
+
+        if (min > 0) {
+            if (hour > 0) {
+                timeString += " " // add space
+            }
+
+            timeString += min
+        }
+
+        return timeString
     }
 }
+
