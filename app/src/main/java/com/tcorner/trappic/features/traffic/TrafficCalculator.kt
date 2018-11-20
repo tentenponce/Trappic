@@ -34,4 +34,3 @@ object TrafficCalculator {
         return if (percentage < 0) 0.0 else percentage
     }
 }
-

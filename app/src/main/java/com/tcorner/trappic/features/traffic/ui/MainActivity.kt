@@ -7,7 +7,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.tcorner.trappic.R
 import com.tcorner.trappic.core.base.BaseActivity
@@ -30,6 +32,9 @@ class MainActivity : BaseActivity(),
 
     private lateinit var mMap: GoogleMap
 
+    private var mPolyLines = hashMapOf<String, Polyline>()
+    private var mMarkers = hashMapOf<String, Marker>()
+
     private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +48,7 @@ class MainActivity : BaseActivity(),
 
         mainViewModel = viewModel(viewModelFactory) {
             observe(cubaoTraffic) {
-                showCubaoLine(cubaoTraffic.value)
+                showCubaoLine(cubaoTraffic.value!!)
             }
             failure(failure, ::handleFailure)
         }
@@ -71,46 +76,66 @@ class MainActivity : BaseActivity(),
         /* TODO handle failure */
     }
 
-    private fun showCubaoLine(cubaoTraffic: TrafficInfo?) {
-        /* add line */
-        mMap.addPolyline(
-            PolylineOptions()
-                .add(
+    private fun showCubaoLine(cubaoTraffic: TrafficInfo) {
+        if (mPolyLines[cubaoTraffic.name] == null) {
+            /* add line */
+            val polyline = mMap.addPolyline(
+                buildPolyline(
                     LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG),
-                    LatLng(EdsaLocation.SANTOLAN_LAT, EdsaLocation.SANTOLAN_LNG)
+                    LatLng(EdsaLocation.SANTOLAN_LAT, EdsaLocation.SANTOLAN_LNG),
+                    TrafficCalculatorFactory.buildTrafficColor(this, cubaoTraffic)
                 )
-                .width(POLYLINE_WIDTH)
-                .color(TrafficCalculatorFactory.buildTrafficColor(this, cubaoTraffic))
+            )
+
+            mPolyLines[cubaoTraffic.name] = polyline
+        }
+
+        if (mMarkers[cubaoTraffic.name] == null) {
+            /* add marker */
+            val marker = mMap.addMarker(
+                buildMarker(
+                    LatLng(EdsaLocation.QMART_SANTOLAN_CENTER_LAT, EdsaLocation.QMART_SANTOLAN_CENTER_LNG),
+                    cubaoTraffic.name,
+                    TrafficCalculatorFactory.getDuration(cubaoTraffic),
+                    TrafficCalculatorFactory.getDurationInTraffic(cubaoTraffic)
+                )
+            )
+
+            marker.showInfoWindow() // show marker
+
+            mMarkers[cubaoTraffic.name] = marker
+        } else {
+            val marker = mMarkers[cubaoTraffic.name]!!
+
+            marker.title = buildDuration(cubaoTraffic.name, cubaoTraffic.duration)
+            marker.snippet = buildTrafficDuration(cubaoTraffic.durationInTraffic)
+        }
+    }
+
+    private fun buildPolyline(origin: LatLng, departure: LatLng, color: Int) =
+        PolylineOptions()
+            .add(origin, departure)
+            .width(POLYLINE_WIDTH)
+            .color(color)
+
+    private fun buildMarker(latLng: LatLng, name: String, duration: Double, durationInTraffic: Double) =
+        MarkerOptions()
+            .position(latLng)
+            .title(buildDuration(name, duration))
+            .snippet(buildTrafficDuration(durationInTraffic))
+            .flat(true)
+
+    private fun buildDuration(name: String, duration: Double) =
+        String.format(
+            "%s %smin", name,
+            if (duration < 0) 0 else buildTime(duration.toInt())
         )
 
-        /* add marker */
-        mMap.addMarker(
-            buildMarker(
-                LatLng(EdsaLocation.QMART_SANTOLAN_CENTER_LAT, EdsaLocation.QMART_SANTOLAN_CENTER_LNG),
-                cubaoTraffic?.name ?: getString(R.string.unknown_road),
-                TrafficCalculatorFactory.getDuration(cubaoTraffic),
-                TrafficCalculatorFactory.getDurationInTraffic(cubaoTraffic)
-            )
-        ).showInfoWindow()
-    }
-
-    private fun buildMarker(latLng: LatLng, name: String, duration: Double, durationInTraffic: Double): MarkerOptions {
-        return MarkerOptions()
-            .position(latLng)
-            .title(
-                String.format(
-                    "%s %smin", name,
-                    if (duration < 0) 0 else buildTime(duration.toInt())
-                )
-            )
-            .snippet(
-                String.format(
-                    "+ %smin on Traffic",
-                    if (durationInTraffic < 0) 0 else buildTime(durationInTraffic.toInt())
-                )
-            )
-            .flat(true)
-    }
+    private fun buildTrafficDuration(durationInTraffic: Double) =
+        String.format(
+            "+ %smin on Traffic",
+            if (durationInTraffic < 0) 0 else buildTime(durationInTraffic.toInt())
+        )
 
     private fun buildTime(time: Int): String {
         val splittedTime = DateUtil.splitToComponentTimes(time)
