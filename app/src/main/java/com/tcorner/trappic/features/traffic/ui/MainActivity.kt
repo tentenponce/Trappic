@@ -99,11 +99,17 @@ class MainActivity : BaseActivity(),
             .position(latLng)
             .title(
                 String.format(
-                    "%s %smin + %smin", name,
-                    if (duration < 0) 0 else buildTime(duration.toInt()),
+                    "%s %smin", name,
+                    if (duration < 0) 0 else buildTime(duration.toInt())
+                )
+            )
+            .snippet(
+                String.format(
+                    "+ %smin on Traffic",
                     if (durationInTraffic < 0) 0 else buildTime(durationInTraffic.toInt())
                 )
             )
+            .flat(true)
     }
 
     private fun buildTime(time: Int): String {
