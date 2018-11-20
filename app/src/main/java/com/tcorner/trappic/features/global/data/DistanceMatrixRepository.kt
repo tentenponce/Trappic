@@ -3,7 +3,10 @@ package com.tcorner.trappic.features.global.data
 import com.tcorner.trappic.BuildConfig
 import com.tcorner.trappic.core.exception.Failure
 import com.tcorner.trappic.core.interactor.Either
-import com.tcorner.trappic.features.traffic.model.DistanceMatrix
+import com.tcorner.trappic.core.interactor.flatMap
+import com.tcorner.trappic.features.traffic.interactor.GetCubaoTraffic
+import com.tcorner.trappic.features.traffic.interactor.TrafficFailure
+import com.tcorner.trappic.features.traffic.model.TrafficInfo
 import javax.inject.Inject
 
 /**
@@ -25,7 +28,7 @@ interface DistanceMatrixRepository {
         originLng: Double,
         destinationLat: Double,
         destinationLng: Double
-    ): Either<Failure, DistanceMatrix>
+    ): Either<Failure, TrafficInfo>
 
     class DistanceMatrixRepositoryImpl @Inject constructor(private val distanceMatrixClient: DistanceMatrixClient) :
         DistanceMatrixRepository {
@@ -35,7 +38,7 @@ interface DistanceMatrixRepository {
             originLng: Double,
             destinationLat: Double,
             destinationLng: Double
-        ): Either<Failure, DistanceMatrix> {
+        ): Either<Failure, TrafficInfo> {
             return distanceMatrixClient.getDistanceMatrix(
                 origins = "$originLat, $originLng",
                 destinations = "$destinationLat, $destinationLng",
@@ -43,7 +46,23 @@ interface DistanceMatrixRepository {
                 mode = TRAVEL_MODE,
                 departureTime = DEPARTURE_TIME,
                 trafficModel = TRAFFIC_MODEL
-            )
+            ).flatMap {
+                val duration: Double =
+                    it.rows?.get(0)?.elements?.get(0)?.duration?.value?.toDouble()
+                        ?: return@flatMap Either.Left(TrafficFailure.NullDuration()) // get travel duration or return a failure
+
+                val durationInTraffic: Double =
+                    it.rows[0].elements?.get(0)?.durationInTraffic?.value?.toDouble()
+                        ?: return@flatMap Either.Left(TrafficFailure.NullDurationTraffic()) // get the travel traffic duration or return a failure
+
+                Either.Right(
+                    TrafficInfo(
+                        name = GetCubaoTraffic.NAME,
+                        duration = duration,
+                        durationInTraffic = durationInTraffic
+                    )
+                )
+            }
         }
     }
 }
