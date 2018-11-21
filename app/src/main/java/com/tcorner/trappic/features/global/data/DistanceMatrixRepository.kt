@@ -4,7 +4,6 @@ import com.tcorner.trappic.BuildConfig
 import com.tcorner.trappic.core.exception.Failure
 import com.tcorner.trappic.core.interactor.Either
 import com.tcorner.trappic.core.interactor.flatMap
-import com.tcorner.trappic.features.traffic.interactor.GetCubaoTraffic
 import com.tcorner.trappic.features.traffic.interactor.TrafficFailure
 import com.tcorner.trappic.features.traffic.model.TrafficInfo
 import javax.inject.Inject
@@ -57,13 +56,8 @@ interface DistanceMatrixRepository {
 
                 Either.Right(
                     TrafficInfo(
-                        name = GetCubaoTraffic.NAME,
                         duration = duration,
-                        durationInTraffic = durationInTraffic,
-                        originLat = originLat,
-                        originLng = originLng,
-                        destinationLat = destinationLat,
-                        destinationLng = destinationLng
+                        durationInTraffic = durationInTraffic
                     )
                 )
             }

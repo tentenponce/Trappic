@@ -6,6 +6,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.PolyUtil
 import com.tcorner.trappic.R
 import com.tcorner.trappic.core.base.BaseActivity
 import com.tcorner.trappic.core.exception.Failure
@@ -17,6 +18,7 @@ import com.tcorner.trappic.features.global.util.DateUtil
 import com.tcorner.trappic.features.traffic.TrafficCalculator
 import com.tcorner.trappic.features.traffic.TrafficCalculatorFactory
 import com.tcorner.trappic.features.traffic.interactor.GetCubaoTraffic
+import com.tcorner.trappic.features.traffic.interactor.GetOrtigasTraffic
 import com.tcorner.trappic.features.traffic.model.TrafficInfo
 
 class MainActivity : BaseActivity(),
@@ -46,6 +48,9 @@ class MainActivity : BaseActivity(),
             observe(cubaoTraffic) {
                 showTrafficInfo(cubaoTraffic.value!!)
             }
+            observe(ortigasTraffic) {
+                showTrafficInfo(ortigasTraffic.value!!)
+            }
             failure(failure, ::handleFailure)
         }
     }
@@ -61,10 +66,16 @@ class MainActivity : BaseActivity(),
                 name = GetCubaoTraffic.NAME,
                 duration = -1.0,
                 durationInTraffic = -1.0,
-                originLat = EdsaLocation.QMART_LAT,
-                originLng = EdsaLocation.QMART_LNG,
-                destinationLat = EdsaLocation.SANTOLAN_LAT,
-                destinationLng = EdsaLocation.SANTOLAN_LNG
+                encodedCoordinates = EdsaLocation.CUBAO_POLYLINES
+            )
+        )
+
+        showTrafficInfo(
+            TrafficInfo(
+                name = GetOrtigasTraffic.NAME,
+                duration = -1.0,
+                durationInTraffic = -1.0,
+                encodedCoordinates = EdsaLocation.ORTIGAS_POLYLINES
             )
         )
 
@@ -83,12 +94,13 @@ class MainActivity : BaseActivity(),
     }
 
     private fun showTrafficInfo(trafficInfo: TrafficInfo) {
+        val latLngs = PolyUtil.decode(trafficInfo.encodedCoordinates)
+
+        /* add line */
         if (mPolyLines[trafficInfo.name] == null) {
-            /* add line */
             val polyline = mMap.addPolyline(
                 buildPolyline(
-                    LatLng(trafficInfo.originLat, trafficInfo.originLng),
-                    LatLng(trafficInfo.destinationLat, trafficInfo.destinationLng),
+                    latLngs,
                     TrafficCalculatorFactory.buildTrafficColor(this, trafficInfo)
                 )
             )
@@ -96,23 +108,16 @@ class MainActivity : BaseActivity(),
             mPolyLines[trafficInfo.name] = polyline
         }
 
+        /* add marker */
         if (mMarkers[trafficInfo.name] == null) {
-            /* add marker */
             val marker = mMap.addMarker(
                 buildMarker(
-                    TrafficCalculator.getCenterOfTwoCoordinates(
-                        originLat = trafficInfo.originLat,
-                        originLng = trafficInfo.originLng,
-                        destinationLat = trafficInfo.destinationLat,
-                        destinationLng = trafficInfo.destinationLng
-                    ),
+                    TrafficCalculator.getCenterOfTwoCoordinates(latLngs),
                     trafficInfo.name,
                     TrafficCalculatorFactory.getDuration(trafficInfo),
                     TrafficCalculatorFactory.getDurationInTraffic(trafficInfo)
                 )
             )
-
-            marker.showInfoWindow() // show marker
 
             mMarkers[trafficInfo.name] = marker
         } else {
@@ -128,9 +133,9 @@ class MainActivity : BaseActivity(),
         }
     }
 
-    private fun buildPolyline(origin: LatLng, departure: LatLng, color: Int) =
+    private fun buildPolyline(coordinates: List<LatLng>, color: Int) =
         PolylineOptions()
-            .add(origin, departure)
+            .addAll(coordinates)
             .width(POLYLINE_WIDTH)
             .color(color)
 

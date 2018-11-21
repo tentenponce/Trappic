@@ -10,25 +10,27 @@ import com.tcorner.trappic.features.traffic.model.TrafficInfo
 import javax.inject.Inject
 
 /**
- * returns traffic information on cubao
+ * returns traffic information on ortigas
+ *
+ * Created by Exequiel Egbert V. Ponce on 11/21/2018.
  */
-class GetCubaoTraffic @Inject constructor(private val distanceMatrixRepository: DistanceMatrixRepository) :
+class GetOrtigasTraffic @Inject constructor(private val distanceMatrixRepository: DistanceMatrixRepository) :
     UseCaseNoParam<TrafficInfo>() {
 
     companion object {
-        const val NAME = "Cubao"
+        const val NAME = "Ortigas"
     }
 
     override suspend fun run(): Either<Failure, TrafficInfo> =
         distanceMatrixRepository.getDistanceMatrix(
-            EdsaLocation.QMART_LAT,
-            EdsaLocation.QMART_LNG,
             EdsaLocation.SANTOLAN_LAT,
-            EdsaLocation.SANTOLAN_LNG
+            EdsaLocation.SANTOLAN_LNG,
+            EdsaLocation.ORTIGAS_LAT,
+            EdsaLocation.ORTIGAS_LNG
         ).map {
             it.copy(
                 name = NAME,
-                encodedCoordinates = EdsaLocation.CUBAO_POLYLINES
+                encodedCoordinates = EdsaLocation.ORTIGAS_POLYLINES
             )
         }
 }

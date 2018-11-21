@@ -14,6 +14,7 @@ object TrafficCalculator {
      * return the color base on the traffic percentage,
      * if supplied is negative, it will return white.
      */
+    @Suppress("DEPRECATION")
     fun getTrafficColor(context: Context, percentage: Double): Int {
         return when {
             percentage >= 70 -> context.resources.getColor(R.color.colorHeavyTraffic)
@@ -35,8 +36,15 @@ object TrafficCalculator {
         return if (percentage < 0) 0.0 else percentage
     }
 
-    fun getCenterOfTwoCoordinates(
-        originLat: Double, originLng: Double,
-        destinationLat: Double, destinationLng: Double
-    ) = LatLng((originLat + destinationLat) / 2, (originLng + destinationLng) / 2)
+    fun getCenterOfTwoCoordinates(latLngs: List<LatLng>): LatLng {
+        var totalLatitude = 0.0
+        var totalLongitude = 0.0
+
+        for (latLng in latLngs) {
+            totalLatitude += latLng.latitude
+            totalLongitude += latLng.longitude
+        }
+
+        return LatLng(totalLatitude / latLngs.size, totalLongitude / latLngs.size)
+    }
 }

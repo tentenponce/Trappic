@@ -8,8 +8,11 @@ data class TrafficInfo(
     val name: String,
     val duration: Double,
     val durationInTraffic: Double,
-    val originLat: Double,
-    val originLng: Double,
-    val destinationLat: Double,
-    val destinationLng: Double
-)
+    val encodedCoordinates: String
+) {
+    constructor(
+        duration: Double,
+        durationInTraffic: Double
+    ) :
+            this("", duration, durationInTraffic, "")
+}
