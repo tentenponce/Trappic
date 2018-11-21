@@ -7,5 +7,9 @@ package com.tcorner.trappic.features.traffic.model
 data class TrafficInfo(
     val name: String,
     val duration: Double,
-    val durationInTraffic: Double
+    val durationInTraffic: Double,
+    val originLat: Double,
+    val originLng: Double,
+    val destinationLat: Double,
+    val destinationLng: Double
 )

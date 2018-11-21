@@ -59,7 +59,11 @@ interface DistanceMatrixRepository {
                     TrafficInfo(
                         name = GetCubaoTraffic.NAME,
                         duration = duration,
-                        durationInTraffic = durationInTraffic
+                        durationInTraffic = durationInTraffic,
+                        originLat = originLat,
+                        originLng = originLng,
+                        destinationLat = destinationLat,
+                        destinationLng = destinationLng
                     )
                 )
             }

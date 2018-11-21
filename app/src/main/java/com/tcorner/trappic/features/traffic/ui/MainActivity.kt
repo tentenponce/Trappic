@@ -14,6 +14,7 @@ import com.tcorner.trappic.core.extension.observe
 import com.tcorner.trappic.core.extension.viewModel
 import com.tcorner.trappic.features.global.data.EdsaLocation
 import com.tcorner.trappic.features.global.util.DateUtil
+import com.tcorner.trappic.features.traffic.TrafficCalculator
 import com.tcorner.trappic.features.traffic.TrafficCalculatorFactory
 import com.tcorner.trappic.features.traffic.interactor.GetCubaoTraffic
 import com.tcorner.trappic.features.traffic.model.TrafficInfo
@@ -43,7 +44,7 @@ class MainActivity : BaseActivity(),
 
         mainViewModel = viewModel(viewModelFactory) {
             observe(cubaoTraffic) {
-                showCubaoLine(cubaoTraffic.value!!)
+                showTrafficInfo(cubaoTraffic.value!!)
             }
             failure(failure, ::handleFailure)
         }
@@ -55,7 +56,17 @@ class MainActivity : BaseActivity(),
         mainViewModel.getTrafficInfo()
 
         /* setup lines initially */
-        showCubaoLine(TrafficInfo(name = GetCubaoTraffic.NAME, duration = -1.0, durationInTraffic = -1.0))
+        showTrafficInfo(
+            TrafficInfo(
+                name = GetCubaoTraffic.NAME,
+                duration = -1.0,
+                durationInTraffic = -1.0,
+                originLat = EdsaLocation.QMART_LAT,
+                originLng = EdsaLocation.QMART_LNG,
+                destinationLat = EdsaLocation.SANTOLAN_LAT,
+                destinationLng = EdsaLocation.SANTOLAN_LNG
+            )
+        )
 
         /* setup the camera */
         val qMartLocation = LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG)
@@ -71,39 +82,44 @@ class MainActivity : BaseActivity(),
         /* TODO handle failure */
     }
 
-    private fun showCubaoLine(cubaoTraffic: TrafficInfo) {
-        if (mPolyLines[cubaoTraffic.name] == null) {
+    private fun showTrafficInfo(trafficInfo: TrafficInfo) {
+        if (mPolyLines[trafficInfo.name] == null) {
             /* add line */
             val polyline = mMap.addPolyline(
                 buildPolyline(
-                    LatLng(EdsaLocation.QMART_LAT, EdsaLocation.QMART_LNG),
-                    LatLng(EdsaLocation.SANTOLAN_LAT, EdsaLocation.SANTOLAN_LNG),
-                    TrafficCalculatorFactory.buildTrafficColor(this, cubaoTraffic)
+                    LatLng(trafficInfo.originLat, trafficInfo.originLng),
+                    LatLng(trafficInfo.destinationLat, trafficInfo.destinationLng),
+                    TrafficCalculatorFactory.buildTrafficColor(this, trafficInfo)
                 )
             )
 
-            mPolyLines[cubaoTraffic.name] = polyline
+            mPolyLines[trafficInfo.name] = polyline
         }
 
-        if (mMarkers[cubaoTraffic.name] == null) {
+        if (mMarkers[trafficInfo.name] == null) {
             /* add marker */
             val marker = mMap.addMarker(
                 buildMarker(
-                    LatLng(EdsaLocation.QMART_SANTOLAN_CENTER_LAT, EdsaLocation.QMART_SANTOLAN_CENTER_LNG),
-                    cubaoTraffic.name,
-                    TrafficCalculatorFactory.getDuration(cubaoTraffic),
-                    TrafficCalculatorFactory.getDurationInTraffic(cubaoTraffic)
+                    TrafficCalculator.getCenterOfTwoCoordinates(
+                        originLat = trafficInfo.originLat,
+                        originLng = trafficInfo.originLng,
+                        destinationLat = trafficInfo.destinationLat,
+                        destinationLng = trafficInfo.destinationLng
+                    ),
+                    trafficInfo.name,
+                    TrafficCalculatorFactory.getDuration(trafficInfo),
+                    TrafficCalculatorFactory.getDurationInTraffic(trafficInfo)
                 )
             )
 
             marker.showInfoWindow() // show marker
 
-            mMarkers[cubaoTraffic.name] = marker
+            mMarkers[trafficInfo.name] = marker
         } else {
-            val marker = mMarkers[cubaoTraffic.name]!!
+            val marker = mMarkers[trafficInfo.name]!!
 
-            marker.title = buildDuration(cubaoTraffic.name, cubaoTraffic.duration)
-            marker.snippet = buildTrafficDuration(cubaoTraffic.durationInTraffic)
+            marker.title = buildDuration(trafficInfo.name, trafficInfo.duration)
+            marker.snippet = buildTrafficDuration(trafficInfo.durationInTraffic)
 
             if (marker.isInfoWindowShown) {
                 marker.hideInfoWindow()

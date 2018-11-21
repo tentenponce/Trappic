@@ -1,6 +1,7 @@
 package com.tcorner.trappic.features.traffic
 
 import android.content.Context
+import com.google.android.gms.maps.model.LatLng
 import com.tcorner.trappic.R
 
 /**
@@ -33,4 +34,9 @@ object TrafficCalculator {
 
         return if (percentage < 0) 0.0 else percentage
     }
+
+    fun getCenterOfTwoCoordinates(
+        originLat: Double, originLng: Double,
+        destinationLat: Double, destinationLng: Double
+    ) = LatLng((originLat + destinationLat) / 2, (originLng + destinationLng) / 2)
 }

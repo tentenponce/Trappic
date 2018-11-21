@@ -3,7 +3,6 @@ package com.tcorner.trappic.features.traffic.interactor
 import com.tcorner.trappic.core.exception.Failure
 import com.tcorner.trappic.core.interactor.Either
 import com.tcorner.trappic.core.interactor.UseCaseNoParam
-import com.tcorner.trappic.core.interactor.flatMap
 import com.tcorner.trappic.features.global.data.DistanceMatrixRepository
 import com.tcorner.trappic.features.global.data.EdsaLocation
 import com.tcorner.trappic.features.traffic.model.TrafficInfo
