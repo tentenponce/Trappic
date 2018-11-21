@@ -5,12 +5,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.tcorner.trappic.R
 import com.tcorner.trappic.core.base.BaseActivity
 import com.tcorner.trappic.core.exception.Failure
@@ -109,6 +104,11 @@ class MainActivity : BaseActivity(),
 
             marker.title = buildDuration(cubaoTraffic.name, cubaoTraffic.duration)
             marker.snippet = buildTrafficDuration(cubaoTraffic.durationInTraffic)
+
+            if (marker.isInfoWindowShown) {
+                marker.hideInfoWindow()
+                marker.showInfoWindow()
+            }
         }
     }
 
