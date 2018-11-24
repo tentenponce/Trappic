@@ -31,11 +31,14 @@ object TrafficCalculator {
      * return 0 if result is negative
      */
     fun getTrafficPercentage(duration: Double, durationInTraffic: Double): Double {
-        val percentage = ((durationInTraffic - duration) / duration) * 100
+        val percentage = 100 - ((duration / durationInTraffic) * 100)
 
         return if (percentage < 0) 0.0 else percentage
     }
 
+    /**
+     * get center coordinates of the given list of coordinates
+     */
     fun getCenterOfTwoCoordinates(latLngs: List<LatLng>): LatLng {
         var totalLatitude = 0.0
         var totalLongitude = 0.0
